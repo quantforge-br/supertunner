@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Afinador Studio</string>
+    <string name="instrument_acoustic">Violão</string>
+    <string name="instrument_electric">Guitarra</string>
+    <string name="mode_auto">Automático</string>
+    <string name="mode_manual">Manual</string>
+    <string name="tuning_sheet_title">Afinações</string>
+    <string name="tuning_sheet_subtitle">Escolha uma afinação para {instrument}</string>
+    <string name="status_listening">Toque uma corda…</string>
+    <string name="status_in_tune">Afinado</string>
+    <string name="status_flat_hint">Mais grave • Aperte a tarraxa</string>
+    <string name="status_sharp_hint">Mais agudo • Afrouxe a tarraxa</string>
+    <string name="status_listening_manual">Toque a corda %1$s (%2$s)</string>
+    <string name="mic_permission_title">Microfone necessário</string>
+    <string name="mic_permission_desc">O Afinador Studio processa o áudio localmente no seu aparelho para detectar as notas com precisão. Nenhum áudio é gravado ou enviado.</string>
+    <string name="mic_permission_cta">Ativar microfone</string>
+    <string name="mic_permission_settings">Abrir configurações</string>
+    <string name="reference_tone_hint">Toque em uma corda para ouvir o som de referência</string>
+    <string name="cd_select_tuning">Selecionar afinação</string>
+    <string name="cd_toggle_auto">Alternar modo automático</string>
+    <string name="cd_play_tone">Ouvir som de referência da corda %1$s</string>
+    <string name="cd_mic_active">Microfone ativo</string>
+</resources>

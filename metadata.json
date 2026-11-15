@@ -1,0 +1,6 @@
+{
+  "name": "Afinador Studio",
+  "description": "Afinador de precisão para violão e guitarra com detecção em tempo real, afinações alternativas e som de referência por corda.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
