@@ -44,14 +44,13 @@ import com.example.ui.theme.JetBrainsMonoFontFamily
 import com.example.ui.theme.NeonEmerald
 import com.example.ui.theme.NeonEmeraldSoft
 import com.example.ui.theme.SpaceGroteskFontFamily
-import com.example.ui.theme.StudioBorder
 import com.example.ui.theme.StudioConsole
 import com.example.ui.theme.StudioElevated
+import com.example.ui.theme.StudioHairline
 import com.example.ui.theme.StudioObsidian
 import com.example.ui.theme.TextCrisp
 import com.example.ui.theme.TextDim
 import com.example.ui.theme.TextMuted
-import java.util.Locale
 
 @Composable
 fun StringPegConsole(
@@ -64,39 +63,44 @@ fun StringPegConsole(
         modifier = modifier.testTag("string_peg_console"),
         shape = RoundedCornerShape(24.dp),
         color = StudioConsole,
-        border = BorderStroke(1.dp, StudioBorder),
-        tonalElevation = 2.dp
+        border = BorderStroke(1.dp, StudioHairline)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 14.dp, vertical = 14.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Header with Auto / Manual toggle
+            // Compact single-line header: subtle hint + Auto/Manual toggle
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = if (uiState.activePreset.isChromatic) {
-                            "Cordas de referência"
-                        } else {
-                            "Cordas • ${uiState.activePreset.namePt}"
-                        },
-                        style = MaterialTheme.typography.titleMedium,
-                        color = TextCrisp
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
+                        contentDescription = null,
+                        tint = if (uiState.playingStringNumber != null) NeonEmerald else TextDim,
+                        modifier = Modifier.size(15.dp)
                     )
                     Text(
-                        text = stringResource(R.string.reference_tone_hint),
+                        text = if (uiState.playingStringNumber != null) {
+                            "Reproduzindo ${uiState.playingStringNumber}ª corda"
+                        } else {
+                            "Toque na corda para ouvir"
+                        },
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextMuted
+                        color = if (uiState.playingStringNumber != null) NeonEmerald else TextMuted
                     )
                 }
 
-                // Auto/Manual Toggle Chip
                 val isAuto = uiState.isAutoMode
                 Surface(
                     modifier = Modifier
@@ -109,22 +113,18 @@ fun StringPegConsole(
                         )
                         .testTag("mode_toggle_button"),
                     shape = RoundedCornerShape(50),
-                    color = if (isAuto) NeonEmeraldSoft else StudioElevated,
-                    border = BorderStroke(
-                        1.dp,
-                        if (isAuto) NeonEmerald.copy(alpha = 0.55f) else StudioBorder
-                    )
+                    color = if (isAuto) NeonEmeraldSoft else StudioElevated
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        horizontalArrangement = Arrangement.spacedBy(5.dp)
                     ) {
                         Icon(
                             imageVector = if (isAuto) Icons.Rounded.AutoAwesome else Icons.Rounded.Lock,
                             contentDescription = stringResource(R.string.cd_toggle_auto),
                             tint = if (isAuto) NeonEmerald else TextCrisp,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(14.dp)
                         )
                         Text(
                             text = if (isAuto) {
@@ -139,35 +139,13 @@ fun StringPegConsole(
                 }
             }
 
-            // 6 Strings in 2 rows of 3 (6ª, 5ª, 4ª / 3ª, 2ª, 1ª)
-            val strings = uiState.activePreset.strings
-            val topRow = strings.take(3)
-            val bottomRow = strings.drop(3)
-
+            // Sleek single horizontal row of 6 string pegs (6ª -> 1ª)
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                topRow.forEach { stringNote ->
-                    StringPegCard(
-                        stringNote = stringNote,
-                        isSelected = uiState.lockedString?.stringNumber == stringNote.stringNumber,
-                        isDetected = uiState.detectedString?.stringNumber == stringNote.stringNumber,
-                        isInTune = uiState.pitchZone == PitchZone.IN_TUNE &&
-                            uiState.detectedString?.stringNumber == stringNote.stringNumber,
-                        isPlayingTone = uiState.playingStringNumber == stringNote.stringNumber,
-                        onClick = { onStringTap(stringNote) },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                bottomRow.forEach { stringNote ->
-                    StringPegCard(
+                uiState.activePreset.strings.forEach { stringNote ->
+                    MinimalStringPeg(
                         stringNote = stringNote,
                         isSelected = uiState.lockedString?.stringNumber == stringNote.stringNumber,
                         isDetected = uiState.detectedString?.stringNumber == stringNote.stringNumber,
@@ -184,7 +162,7 @@ fun StringPegConsole(
 }
 
 @Composable
-private fun StringPegCard(
+private fun MinimalStringPeg(
     stringNote: StringNote,
     isSelected: Boolean,
     isDetected: Boolean,
@@ -193,36 +171,35 @@ private fun StringPegCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val active = isSelected || isDetected || isPlayingTone
-    val borderColor by animateColorAsState(
-        targetValue = when {
-            isInTune || isPlayingTone -> NeonEmerald
-            isSelected -> NeonEmerald.copy(alpha = 0.75f)
-            isDetected -> NeonEmerald.copy(alpha = 0.45f)
-            else -> StudioBorder
-        },
-        animationSpec = tween(160),
-        label = "peg_border"
-    )
+    val isHighlighted = isSelected || isDetected || isPlayingTone
     val bgColor by animateColorAsState(
         targetValue = when {
             isInTune || isPlayingTone -> NeonEmeraldSoft
             isSelected -> StudioElevated
-            isDetected -> StudioElevated
-            else -> StudioObsidian.copy(alpha = 0.72f)
+            isDetected -> StudioElevated.copy(alpha = 0.85f)
+            else -> StudioObsidian.copy(alpha = 0.65f)
         },
-        animationSpec = tween(160),
+        animationSpec = tween(150),
         label = "peg_bg"
     )
+    val accentColor by animateColorAsState(
+        targetValue = when {
+            isInTune || isPlayingTone || isSelected -> NeonEmerald
+            isDetected -> TextCrisp
+            else -> TextDim
+        },
+        animationSpec = tween(150),
+        label = "peg_accent"
+    )
 
-    // String thickness bar proportional to string gauge (6th thickest -> 1st thinnest)
+    // Subtle string thickness indicator
     val gaugeHeight = when (stringNote.stringNumber) {
-        6 -> 4.dp
-        5 -> 3.4.dp
-        4 -> 2.8.dp
-        3 -> 2.2.dp
-        2 -> 1.7.dp
-        else -> 1.2.dp
+        6 -> 3.5.dp
+        5 -> 3.dp
+        4 -> 2.5.dp
+        3 -> 2.dp
+        2 -> 1.5.dp
+        else -> 1.dp
     }
 
     Surface(
@@ -237,87 +214,62 @@ private fun StringPegCard(
             .testTag("string_peg_${stringNote.stringNumber}"),
         shape = RoundedCornerShape(16.dp),
         color = bgColor,
-        border = BorderStroke(if (active) 1.5.dp else 1.dp, borderColor)
+        border = if (isHighlighted) {
+            BorderStroke(1.2.dp, accentColor.copy(alpha = 0.65f))
+        } else {
+            BorderStroke(1.dp, StudioHairline.copy(alpha = 0.7f))
+        }
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(vertical = 10.dp, horizontal = 4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            // Visual string gauge line
+            // Minimal gauge bar
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.72f)
+                    .fillMaxWidth(0.55f)
                     .height(gaugeHeight)
                     .clip(RoundedCornerShape(50))
-                    .background(
-                        if (active) NeonEmerald else TextDim.copy(alpha = 0.7f)
-                    )
+                    .background(if (isHighlighted) accentColor else TextDim.copy(alpha = 0.55f))
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Primary note letter
+            Text(
+                text = stringNote.shortLabel,
+                fontFamily = SpaceGroteskFontFamily,
+                fontWeight = FontWeight.Bold,
+                fontSize = 19.sp,
+                color = if (isHighlighted) TextCrisp else TextCrisp.copy(alpha = 0.86f)
+            )
+
+            Spacer(modifier = Modifier.height(3.dp))
+
+            // Subtle string number or active pulse dot
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(3.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(22.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (active) NeonEmerald.copy(alpha = 0.2f) else StudioElevated
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "${stringNote.stringNumber}ª",
-                        fontFamily = JetBrainsMonoFontFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 10.sp,
-                        color = if (active) NeonEmerald else TextMuted
+                if (isPlayingTone) {
+                    Box(
+                        modifier = Modifier
+                            .size(5.dp)
+                            .clip(CircleShape)
+                            .background(NeonEmerald)
                     )
                 }
-
-                Icon(
-                    imageVector = Icons.AutoMirrored.Rounded.VolumeUp,
-                    contentDescription = stringResource(R.string.cd_play_tone, stringNote.fullLabel),
-                    tint = if (isPlayingTone) NeonEmerald else TextDim,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            Row(
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.Center
-            ) {
                 Text(
-                    text = stringNote.shortLabel,
-                    fontFamily = SpaceGroteskFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 22.sp,
-                    color = if (active) TextCrisp else TextCrisp.copy(alpha = 0.9f)
-                )
-                Text(
-                    text = stringNote.octave.toString(),
+                    text = "${stringNote.stringNumber}ª",
                     fontFamily = JetBrainsMonoFontFamily,
                     fontWeight = FontWeight.Medium,
-                    fontSize = 12.sp,
-                    color = if (active) NeonEmerald else TextMuted,
-                    modifier = Modifier.padding(bottom = 2.dp, start = 1.dp)
+                    fontSize = 11.sp,
+                    color = if (isHighlighted) accentColor else TextMuted
                 )
             }
-
-            Text(
-                text = String.format(Locale.US, "%.1f Hz", stringNote.frequencyHz),
-                fontFamily = JetBrainsMonoFontFamily,
-                fontSize = 10.sp,
-                color = TextMuted
-            )
         }
     }
 }

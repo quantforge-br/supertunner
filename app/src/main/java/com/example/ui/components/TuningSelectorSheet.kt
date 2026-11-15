@@ -1,6 +1,5 @@
 package com.example.ui.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -43,9 +43,7 @@ import com.example.domain.TuningPreset
 import com.example.ui.theme.JetBrainsMonoFontFamily
 import com.example.ui.theme.NeonEmerald
 import com.example.ui.theme.NeonEmeraldSoft
-import com.example.ui.theme.StudioBorder
 import com.example.ui.theme.StudioConsole
-import com.example.ui.theme.StudioElevated
 import com.example.ui.theme.TextCrisp
 import com.example.ui.theme.TextMuted
 
@@ -79,7 +77,7 @@ fun TuningSelectorSheet(
                 color = TextCrisp
             )
             Text(
-                text = "Escolha uma afinação para ${instrument.labelPt.lowercase()}",
+                text = "Para ${instrument.labelPt.lowercase()}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextMuted
             )
@@ -88,7 +86,7 @@ fun TuningSelectorSheet(
 
             LazyColumn(
                 contentPadding = PaddingValues(bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 TuningCategory.entries.forEach { category ->
                     val presets = grouped[category].orEmpty()
@@ -97,8 +95,9 @@ fun TuningSelectorSheet(
                             Text(
                                 text = category.titlePt.uppercase(),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = NeonEmerald,
-                                modifier = Modifier.padding(top = 8.dp, bottom = 2.dp)
+                                color = TextMuted,
+                                letterSpacing = 1.2.sp,
+                                modifier = Modifier.padding(top = 12.dp, bottom = 4.dp, start = 4.dp)
                             )
                         }
                         items(presets, key = { it.id }) { preset ->
@@ -125,26 +124,22 @@ private fun TuningPresetRow(
         modifier = Modifier
             .fillMaxWidth()
             .minimumInteractiveComponentSize()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(14.dp))
             .clickable(role = Role.Button, onClick = onClick)
             .testTag("tuning_option_${preset.id}"),
-        shape = RoundedCornerShape(16.dp),
-        color = if (isSelected) NeonEmeraldSoft else StudioElevated,
-        border = BorderStroke(
-            width = if (isSelected) 1.5.dp else 1.dp,
-            color = if (isSelected) NeonEmerald else StudioBorder
-        )
+        shape = RoundedCornerShape(14.dp),
+        color = if (isSelected) NeonEmeraldSoft else Color.Transparent
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .padding(horizontal = 14.dp, vertical = 13.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(3.dp)
+                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
                     text = preset.namePt,
@@ -162,27 +157,20 @@ private fun TuningPresetRow(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = StudioConsole,
-                    border = BorderStroke(1.dp, StudioBorder)
-                ) {
-                    Text(
-                        text = preset.summaryNotes,
-                        fontFamily = JetBrainsMonoFontFamily,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 11.sp,
-                        color = if (isSelected) NeonEmerald else TextCrisp,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp)
-                    )
-                }
+                Text(
+                    text = preset.summaryNotes,
+                    fontFamily = JetBrainsMonoFontFamily,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 12.sp,
+                    color = if (isSelected) NeonEmerald else TextMuted
+                )
 
                 if (isSelected) {
                     Icon(
-                        imageVector = Icons.Rounded.CheckCircle,
+                        imageVector = Icons.Rounded.Check,
                         contentDescription = null,
                         tint = NeonEmerald,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }

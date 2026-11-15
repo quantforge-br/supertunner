@@ -15,12 +15,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -28,10 +26,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
-import androidx.compose.material.icons.rounded.MusicNote
-import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -48,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -67,10 +63,9 @@ import com.example.ui.components.StringPegConsole
 import com.example.ui.components.TunerGaugeCard
 import com.example.ui.components.TuningSelectorSheet
 import com.example.ui.theme.NeonEmerald
-import com.example.ui.theme.NeonEmeraldSoft
-import com.example.ui.theme.StudioBorder
 import com.example.ui.theme.StudioConsole
 import com.example.ui.theme.StudioElevated
+import com.example.ui.theme.StudioHairline
 import com.example.ui.theme.StudioObsidian
 import com.example.ui.theme.TextCrisp
 import com.example.ui.theme.TextDim
@@ -135,7 +130,7 @@ fun TunerScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 10.dp),
             contentAlignment = Alignment.TopCenter
         ) {
             val isExpandedWidth = maxWidth >= 640.dp
@@ -143,10 +138,10 @@ fun TunerScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .widthIn(max = 1040.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .widthIn(max = 1000.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                StudioTopHeader(
+                MinimalTopBar(
                     uiState = uiState,
                     onSelectInstrument = viewModel::selectInstrument,
                     onOpenTuningSheet = viewModel::openTuningSheet
@@ -157,7 +152,8 @@ fun TunerScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(
                             modifier = Modifier
@@ -189,9 +185,9 @@ fun TunerScreen(
 
                         Column(
                             modifier = Modifier
-                                .weight(0.95f)
+                                .weight(0.9f)
                                 .fillMaxHeight(),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                            verticalArrangement = Arrangement.Center
                         ) {
                             StringPegConsole(
                                 uiState = uiState,
@@ -199,8 +195,6 @@ fun TunerScreen(
                                 onToggleAutoMode = viewModel::toggleAutoMode,
                                 modifier = Modifier.fillMaxWidth()
                             )
-
-                            ActiveTuningSummaryBanner(uiState = uiState)
                         }
                     }
                 } else {
@@ -252,204 +246,94 @@ fun TunerScreen(
 }
 
 @Composable
-private fun StudioTopHeader(
+private fun MinimalTopBar(
     uiState: TunerUiState,
     onSelectInstrument: (InstrumentType) -> Unit,
     onOpenTuningSheet: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        // Brand Row + Instrument Segmented Pill
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(NeonEmeraldSoft),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.GraphicEq,
-                        contentDescription = null,
-                        tint = NeonEmerald,
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
-
-                Column {
-                    Text(
-                        text = stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = TextCrisp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(5.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(6.dp)
-                                .clip(CircleShape)
-                                .background(if (uiState.isListening) NeonEmerald else TextDim)
-                        )
-                        Text(
-                            text = if (uiState.isListening) "Microfone ativo" else "Modo referência",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = TextMuted
-                        )
-                    }
-                }
-            }
-
-            // Violão / Guitarra Segmented Selector
-            Surface(
-                shape = RoundedCornerShape(50),
-                color = StudioConsole,
-                border = BorderStroke(1.dp, StudioBorder)
-            ) {
-                Row(
-                    modifier = Modifier.padding(3.dp),
-                    horizontalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-                    InstrumentType.entries.forEach { item ->
-                        val selected = uiState.instrument == item
-                        Surface(
-                            modifier = Modifier
-                                .minimumInteractiveComponentSize()
-                                .clip(RoundedCornerShape(50))
-                                .clickable(role = Role.RadioButton) { onSelectInstrument(item) }
-                                .testTag("instrument_${item.id}"),
-                            shape = RoundedCornerShape(50),
-                            color = if (selected) StudioElevated else StudioConsole,
-                            border = if (selected) {
-                                BorderStroke(1.dp, NeonEmerald.copy(alpha = 0.45f))
-                            } else {
-                                null
-                            }
-                        ) {
-                            Box(
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = item.labelPt,
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = if (selected) NeonEmerald else TextMuted
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Tuning Preset Selector Bar
+        // Left: Tuning Preset Dropdown Pill with live mic dot
         Surface(
             modifier = Modifier
-                .fillMaxWidth()
+                .weight(1f, fill = false)
                 .minimumInteractiveComponentSize()
-                .clip(RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(50))
                 .clickable(
                     role = Role.Button,
                     onClickLabel = stringResource(R.string.cd_select_tuning),
                     onClick = onOpenTuningSheet
                 )
                 .testTag("open_tuning_sheet_button"),
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(50),
             color = StudioConsole,
-            border = BorderStroke(1.dp, StudioBorder)
+            border = BorderStroke(1.dp, StudioHairline)
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Tune,
-                        contentDescription = null,
-                        tint = NeonEmerald,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Column {
-                        Text(
-                            text = "Afinação ${uiState.activePreset.namePt}",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = TextCrisp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = uiState.activePreset.summaryNotes,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = TextMuted,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
-
+                Box(
+                    modifier = Modifier
+                        .size(7.dp)
+                        .clip(CircleShape)
+                        .background(if (uiState.isListening) NeonEmerald else TextDim)
+                )
+                Text(
+                    text = uiState.activePreset.namePt,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = TextCrisp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
                 Icon(
                     imageVector = Icons.Rounded.KeyboardArrowDown,
                     contentDescription = stringResource(R.string.cd_select_tuning),
-                    tint = TextMuted
+                    tint = TextMuted,
+                    modifier = Modifier.size(18.dp)
                 )
             }
         }
-    }
-}
 
-@Composable
-private fun ActiveTuningSummaryBanner(uiState: TunerUiState) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        color = StudioConsole,
-        border = BorderStroke(1.dp, StudioBorder)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        // Right: Clean Violão / Guitarra Segmented Switch
+        Surface(
+            shape = RoundedCornerShape(50),
+            color = StudioConsole,
+            border = BorderStroke(1.dp, StudioHairline)
         ) {
-            Icon(
-                imageVector = Icons.Rounded.MusicNote,
-                contentDescription = null,
-                tint = NeonEmerald,
-                modifier = Modifier.size(20.dp)
-            )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "${uiState.instrument.labelPt} • ${uiState.activePreset.namePt}",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = TextCrisp
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = uiState.activePreset.descriptionPt,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = TextMuted
-                )
+            Row(
+                modifier = Modifier.padding(3.dp),
+                horizontalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                InstrumentType.entries.forEach { item ->
+                    val selected = uiState.instrument == item
+                    Surface(
+                        modifier = Modifier
+                            .minimumInteractiveComponentSize()
+                            .clip(RoundedCornerShape(50))
+                            .clickable(role = Role.RadioButton) { onSelectInstrument(item) }
+                            .testTag("instrument_${item.id}"),
+                        shape = RoundedCornerShape(50),
+                        color = if (selected) StudioElevated else Color.Transparent
+                    ) {
+                        Box(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = item.labelPt,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = if (selected) NeonEmerald else TextMuted
+                            )
+                        }
+                    }
+                }
             }
         }
     }
